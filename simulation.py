@@ -24,10 +24,9 @@ def reynolds(velocity):
 
 
 def friction_factor(reynolds_num):
-    # If turbulent use Swamee-Jain equation for approximating Colebrook friction factor
+    # If turbulent
     if reynolds_num >= 4000:
         darcy = 0.0055 * (1 + (20000 * (tube_roughness/tube_diameter) + (1000000/reynolds_num))**(1/3))
-        swamee_jain = 0.25 / (math.log10((tube_roughness/(3.7*tube_diameter)) + (5.74/(reynolds_num**0.9))) ** 2)
         return darcy
     # If laminar use below
     return 64/reynolds_num

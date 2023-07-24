@@ -31,27 +31,27 @@ def friction(velocity):
   elif (2300 < reynolds_num <= 4000):
     return ((64/reynolds_num)+((1/(-1.8 * math.log10(((6.9)/reynolds_num) + (((tube_roughness/tube_diameter)/3.7)**1.11))))**2))/2
   else:
-    return (1/(-1.8 * math.log10(((6.9)/reynolds_num) + (((tube_roughness/tube_diameter)/3.7)**1.11))))**2
+    # return (1/(-1.8 * math.log10(((6.9)/reynolds_num) + (((tube_roughness/tube_diameter)/3.7)**1.11))))**2
     
     #return 0.11 * (tube_roughness/tube_diameter + 68/reynolds_num)**(0.25)
   
-    # def colebrook(friction, reynolds_num=reynolds_num):
-    #   return -2 * math.log10(((tube_roughness/tube_diameter)/3.7) + (2.51/(reynolds_num * math.sqrt(friction)))) - (1/math.sqrt(friction))
-    # return fsolve(colebrook, 0)
+    def colebrook(friction, reynolds_num=reynolds_num):
+      return -2 * math.log10(((tube_roughness/tube_diameter)/3.7) + (2.51/(reynolds_num * math.sqrt(friction)))) - (1/math.sqrt(friction))
+    return fsolve(colebrook, 0.02)
 
 def simulation(tube_length):
     time = 0  # Seconds elapsed from when we started draining
-    time_step = 0.001  # (s)
+    time_step = 0.01  # (s)
     height = water_height_remaining + tube_start_height_below_water_end + tube_length*sin_theta
     end_height = height - water_height_remaining
     previous_exit_velocity = math.sqrt(2*g*height)*0.5
-    #previous_tank_loss_velocity = 0
+    previous_tank_loss_velocity = 0
     while (height > end_height):
         # print(previous_exit_velocity)
         friction_head_loss = head_loss(previous_exit_velocity, tube_length)
         # print(friction_head_loss)
-        minor_head_loss = 0 #(0.5 * previous_tank_loss_velocity * previous_tank_loss_velocity) / (2 * g)
-        exit_velocity = (math.sqrt((2*g*(height - friction_head_loss - minor_head_loss)))) #if friction_head_loss < height else previous_exit_velocity*0.55
+        minor_head_loss = (0.5 * previous_tank_loss_velocity * previous_tank_loss_velocity) / (2 * g)
+        exit_velocity = (math.sqrt((2*g*(height - friction_head_loss - minor_head_loss))))*0.7 if friction_head_loss < height else previous_exit_velocity*0.55
         container_area = container_length * container_width
         tube_area = math.pi * tube_diameter * tube_diameter * (1/4)
         tank_loss_velocity = (tube_area/container_area) * exit_velocity
@@ -61,7 +61,7 @@ def simulation(tube_length):
         height -= height_loss
         time += time_step
         previous_exit_velocity = exit_velocity
-        #previous_tank_loss_velocity = tank_loss_velocity
+        previous_tank_loss_velocity = tank_loss_velocity
     return time
 
 

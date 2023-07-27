@@ -24,7 +24,6 @@ tube2_diameter = 0.0111125 #[m]
 tube2_area = (math.pi * (1/4) * tube2_diameter ** 2)
 tube2_length = 0.04 #[m]
 
-
 def major_head_loss(velocity, tube_length, tube_diameter):
   if velocity == 0:
     return 0
@@ -36,10 +35,8 @@ def minor_head_loss(velocity, k):
 def sudden_expansion_head_loss(tube1_velocity):
   return ((tube1_velocity**2)/(2*g))*(1 - (tube1_area/tube2_area))**2
 
-
 def reynolds(velocity, tube_diameter):
   return (density_of_water * velocity * tube_diameter) / dynamic_viscosity_of_water
-
 
 def friction(velocity, tube_diameter):
   reynolds_num = reynolds(velocity, tube_diameter)
@@ -61,7 +58,7 @@ def second_tube_velocity(tube1_velocity):
 # |__|============\\
 #                 ||
 # Tank -> Tube 1 -> Turn -> Tube 2 -> Exit
-# (v1) -> (v2)   -> (v2) -> (v3)   -> (v3)
+# (v1) ->  (v2)  -> (v2) ->  (v3)  -> (v3)
 def simulation(tube1_length):
     time = 0  # Seconds elapsed from when we started draining
     time_step = 0.01  # (s)
@@ -71,23 +68,23 @@ def simulation(tube1_length):
     while (height > end_height):
         def velocity(tube1_velocity):
           tube2_velocity = second_tube_velocity(tube1_velocity)
-          major_head_loss_1 = major_head_loss(tube1_velocity, tube1_length, tube1_diameter) #First we experience tube 1 friction
-          minor_head_loss_1 = minor_head_loss(tube1_velocity,0.5)                           #Then we experience tube 1 minor loss
-          bend_head_loss = minor_head_loss(tube1_velocity, 1.1)                             #Then I take a right angle turn
+          minor_head_loss_1 = minor_head_loss(tube1_velocity,0.5)                           #First we experience tube 1 minor loss
+          major_head_loss_1 = major_head_loss(tube1_velocity, tube1_length, tube1_diameter) #Then we experience tube 1 friction
+          bend_head_loss = minor_head_loss(tube1_velocity, 1.1)                             #Then I take a right angle turn (back flow losses)
           expansion_head_loss = sudden_expansion_head_loss(tube1_velocity)                  #Then I suddenly enter a large pipe
+          minor_head_loss_2 = minor_head_loss(tube2_velocity,0.5)                           #Then I experience tube 2 minor loss (change in area)
           major_head_loss_2 = major_head_loss(tube2_velocity, tube2_length, tube2_diameter) #Then I experience tube 2 friction
-          minor_head_loss_2 = minor_head_loss(tube2_velocity,0.5)                           #Then I experience tube 2 minor loss
           
           
           try:
             return math.sqrt((2*g*(height - (major_head_loss_1 + minor_head_loss_1 + major_head_loss_2 + minor_head_loss_2 + bend_head_loss + expansion_head_loss)))) - tube1_velocity
           except:
             #fsolve approximates values for the velocity which can lead to math domain errors
-            #the below indicates that the answer is incorrect to fsolve
+            #the below indicates that the velocity tried is not the root we are looking for
             return 10000
         
         v2 = fsolve(velocity, previous_exit_velocity) #Solve the velocity in tube1, using the previous velocity as a starting guess
-        tank_loss_velocity = (tube1_area/container_area) * v2
+        tank_loss_velocity = (tube1_area/container_area) * v2 #This works because the velocity must be constant throughout the tube
         height_loss = tank_loss_velocity * time_step
 
         #Setup next step
@@ -99,8 +96,8 @@ def simulation(tube1_length):
 
 result_20cm = simulation(0.2)
 print(
-    f"LENGTH: 20 cm -> {result_20cm:.2f} seconds ({int(result_20cm//60)}:{round(result_20cm % 60):02}) -> 3:19")
+    f"LENGTH: 20 cm -> {result_20cm:.2f} seconds ({int(result_20cm//60)}:{round(result_20cm % 60):02}) -> 3:19 (without T-Junction)")
 
 result_40cm = simulation(0.4)
 print(
-    f"LENGTH: 40 cm -> {result_40cm:.2f} seconds ({int(result_40cm//60)}:{round(result_40cm % 60):02}) -> 4:26")
+    f"LENGTH: 40 cm -> {result_40cm:.2f} seconds ({int(result_40cm//60)}:{round(result_40cm % 60):02}) -> 4:26 (without T-Junction)")

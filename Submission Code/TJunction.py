@@ -33,7 +33,8 @@ def minor_head_loss(velocity, k):
   return (k * velocity ** 2) / (2 * g)
 
 def sudden_expansion_head_loss(tube1_velocity):
-  return ((tube1_velocity**2)/(2*g))*(1 - (tube1_area/tube2_area))**2
+  return ((tube1_velocity**2)/(2*g))*(1-(tube1_diameter/tube2_diameter))
+
 
 def reynolds(velocity, tube_diameter):
   return (density_of_water * velocity * tube_diameter) / dynamic_viscosity_of_water
@@ -71,13 +72,11 @@ def simulation(tube1_length):
           minor_head_loss_1 = minor_head_loss(tube1_velocity,0.5)                           #First we experience tube 1 minor loss
           major_head_loss_1 = major_head_loss(tube1_velocity, tube1_length, tube1_diameter) #Then we experience tube 1 friction
           bend_head_loss = minor_head_loss(tube1_velocity, 1.1)                             #Then I take a right angle turn (back flow losses)
-          expansion_head_loss = sudden_expansion_head_loss(tube1_velocity)                  #Then I suddenly enter a large pipe
-          minor_head_loss_2 = minor_head_loss(tube2_velocity,0.5)                           #Then I experience tube 2 minor loss (change in area)
+          expansion_head_loss = sudden_expansion_head_loss(tube1_velocity)                  #Then I suddenly enter a larger pipe
           major_head_loss_2 = major_head_loss(tube2_velocity, tube2_length, tube2_diameter) #Then I experience tube 2 friction
           
-          
           try:
-            return math.sqrt((2*g*(height - (major_head_loss_1 + minor_head_loss_1 + major_head_loss_2 + minor_head_loss_2 + bend_head_loss + expansion_head_loss)))) - tube1_velocity
+            return math.sqrt((2*g*(height - (major_head_loss_1 + minor_head_loss_1 + major_head_loss_2 + bend_head_loss + expansion_head_loss)))) - tube1_velocity
           except:
             #fsolve approximates values for the velocity which can lead to math domain errors
             #the below indicates that the velocity tried is not the root we are looking for

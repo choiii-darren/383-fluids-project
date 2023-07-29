@@ -70,17 +70,17 @@ def simulation(tube1_length):
     while (height > end_height):
         def velocity(tube1_velocity):
           tube2_velocity = second_tube_velocity(tube1_velocity)
-          major_head_loss_1 = major_head_loss(tube1_velocity, tube1_length, tube1_diameter) #First we experience tube 1 friction
-          minor_head_loss_1 = minor_head_loss(tube1_velocity,0.5)                           #Then we experience tube 1 minor loss
-          bend_head_loss = minor_head_loss(tube1_velocity, 1.1)                             #Then I take a right angle turn
-          expansion_head_loss = sudden_expansion_head_loss(tube1_velocity)                  #Then I suddenly enter a large pipe
+          minor_head_loss_1 = minor_head_loss(tube1_velocity,0.5)                           #First we experience tube 1 minor loss
+          major_head_loss_1 = major_head_loss(tube1_velocity, tube1_length, tube1_diameter) #Then we experience tube 1 friction
+          bend_head_loss = minor_head_loss(tube1_velocity, 1.1)                             #Then I take a right angle turn (back flow losses)
+          expansion_head_loss = sudden_expansion_head_loss(tube1_velocity)                  #Then I suddenly enter a larger pipe
           major_head_loss_2 = major_head_loss(tube2_velocity, tube2_length, tube2_diameter) #Then I experience tube 2 friction
           
           try:
             return math.sqrt((2*g*(height - (major_head_loss_1 + minor_head_loss_1 + major_head_loss_2 + bend_head_loss + expansion_head_loss)))) - tube1_velocity
           except:
             #fsolve approximates values for the velocity which can lead to math domain errors
-            #the below indicates that the answer is incorrect to fsolve
+            #the below indicates that the velocity tried is not the root we are looking for
             return 10000
         
         tube1_exit_velocity = fsolve(velocity, previous_exit_velocity) #Solve the velocity in tube1, using the previous velocity as a starting guess

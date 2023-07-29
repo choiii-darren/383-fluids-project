@@ -75,10 +75,9 @@ def simulation(tube1_length):
           bend_head_loss = minor_head_loss(tube1_velocity, 1.1)                             #Then I take a right angle turn
           expansion_head_loss = sudden_expansion_head_loss(tube1_velocity)                  #Then I suddenly enter a large pipe
           major_head_loss_2 = major_head_loss(tube2_velocity, tube2_length, tube2_diameter) #Then I experience tube 2 friction
-          minor_head_loss_2 = minor_head_loss(tube2_velocity,0.5)                           #Then I experience tube 2 minor loss
           
           try:
-            return math.sqrt((2*g*(height - (major_head_loss_1 + minor_head_loss_1 + major_head_loss_2 + minor_head_loss_2 + bend_head_loss + expansion_head_loss)))) - tube1_velocity
+            return math.sqrt((2*g*(height - (major_head_loss_1 + minor_head_loss_1 + major_head_loss_2 + bend_head_loss + expansion_head_loss)))) - tube1_velocity
           except:
             #fsolve approximates values for the velocity which can lead to math domain errors
             #the below indicates that the answer is incorrect to fsolve

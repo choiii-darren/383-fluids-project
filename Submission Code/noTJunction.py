@@ -34,7 +34,7 @@ def reynolds(velocity, tube_diameter=tube1_diameter):
   return (density_of_water * velocity * tube_diameter) / dynamic_viscosity_of_water
 
 def friction(velocity, tube_diameter=tube1_diameter):
-  reynolds_num = reynolds(velocity, tube1_diameter)
+  reynolds_num = reynolds(velocity, tube_diameter)
   if (reynolds_num <= 2300):
     return 64/reynolds_num
   else:

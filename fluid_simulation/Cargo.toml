@@ -1,0 +1,12 @@
+[package]
+name = "fluid_simulation"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.4", features = ["derive"] }
+roots = "0.0.8"  # For solving equations
+egui = "0.25"    # GUI library
+eframe = "0.25"  # egui framework
+rand = "0.8"     # For particle randomization
+glam = "0.24"    # Vector mathematics
